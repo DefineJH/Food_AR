@@ -37,7 +37,7 @@ namespace Asset.Scripts
             this.worker = GraphicsWorker.GetWorker(model);
         }
 
-        public IEnumerator Detect(Color32[] picture, int width, System.Action<IList<BoundingBox>> callback)
+        public IEnumerator Detect(Color32[] picture, int width, System.Action<IList<JH.BoundingBox>> callback)
         {
             using (var tensor = TransformInput(picture, IMAGE_SIZE, IMAGE_SIZE, width))
             {
@@ -75,9 +75,9 @@ namespace Asset.Scripts
         }
 
 
-        private IList<BoundingBox> ParseYoloV5Output(Tensor tensor, float thresholdMax)
+        private IList<JH.BoundingBox> ParseYoloV5Output(Tensor tensor, float thresholdMax)
         {
-            var boxes = new List<BoundingBox>();
+            var boxes = new List<JH.BoundingBox>();
 
             for (int i = 0; i < OUTPUT_ROWS; i++)
             {
@@ -93,7 +93,7 @@ namespace Asset.Scripts
                 if (maxScore < thresholdMax)
                     continue;
 
-                boxes.Add(new BoundingBox
+                boxes.Add(new JH.BoundingBox
                 {
                     Dimensions = MapBoundingBoxToCell(dimensions),
                     Confidence = confidence,
@@ -156,7 +156,7 @@ namespace Asset.Scripts
             };
         }
 
-        private IList<BoundingBox> FilterBoundingBoxes(IList<BoundingBox> boxes, int limit, float threshold)
+        private IList<JH.BoundingBox> FilterBoundingBoxes(IList<JH.BoundingBox> boxes, int limit, float threshold)
         {
             var activeCount = boxes.Count;
             var isActiveBoxes = new bool[boxes.Count];
@@ -170,7 +170,7 @@ namespace Asset.Scripts
                     .OrderByDescending(b => b.Box.Confidence)
                     .ToList();
 
-            var results = new List<BoundingBox>();
+            var results = new List<JH.BoundingBox>();
 
             for (int i = 0; i < boxes.Count; i++)
             {

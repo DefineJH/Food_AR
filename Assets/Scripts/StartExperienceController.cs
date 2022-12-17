@@ -9,9 +9,6 @@ public class StartExperienceController : MonoBehaviour{
     GameObject initializeUi;
 
     [SerializeField]
-    GameObject tapToSpawnUi;
-
-    [SerializeField]
     float hideAfterSeconds = 3f;
 
     #endregion
@@ -30,7 +27,6 @@ public class StartExperienceController : MonoBehaviour{
 
     void Start() {
         initializeUi.SetActive(true);
-        tapToSpawnUi.SetActive(false);
     }
 
     void OnEnable() {
@@ -50,7 +46,6 @@ public class StartExperienceController : MonoBehaviour{
 
         if (!initialized && eventArgs.state == ARSessionState.SessionTracking) {
             initializeUi.SetActive(false);
-            tapToSpawnUi.SetActive(true);
 
             initialized = true;
 
@@ -66,7 +61,7 @@ public class StartExperienceController : MonoBehaviour{
     IEnumerator HideTapToSpawnUI() {
         yield return new WaitForSeconds(hideAfterSeconds);
 
-        tapToSpawnUi.SetActive(false);
+        GameManager.Instance.Initalize();
     }
 
     #endregion
