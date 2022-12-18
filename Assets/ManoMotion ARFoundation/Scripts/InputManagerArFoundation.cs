@@ -13,6 +13,7 @@ public class InputManagerArFoundation : InputManagerBaseClass
 
     private float inputFrameScale;
 
+    [SerializeField]
     private int maxCustomResolution = 300;
     
     private Texture2D frameTexture;
@@ -31,6 +32,7 @@ public class InputManagerArFoundation : InputManagerBaseClass
 
     private void Awake()
     {
+        StoragePermisionCheck();
         ForceApplicationPermissions();
 
         inputFrameScale = GetInputScaleValue(Math.Max(Screen.width, Screen.height));

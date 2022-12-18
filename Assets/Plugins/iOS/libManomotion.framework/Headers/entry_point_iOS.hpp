@@ -15,13 +15,15 @@
 
 extern "C"  {
     
-    ENTRY_POINT LicenseStatus init(ManoSettings mano_settings);
+    ENTRY_POINT void init(ManoSettings mano_settings, LicenseStatus* license_status);
     
     ENTRY_POINT void processFrame(HandInfo *hand_info0,   Session *manomotion_session);
     
+    ENTRY_POINT void processFrameTwoHands(HandInfo *hand_info0,HandInfo *hand_info1,   Session *manomotion_session);
+
     ENTRY_POINT void  setFrameArray (void * data);
     
-    //ENTRY_POINT void  setMRFrameArray (void * data);
+    ENTRY_POINT void  setMRFrameArray (void * data);
 
     ENTRY_POINT void  setResolution(int width, int height);
     

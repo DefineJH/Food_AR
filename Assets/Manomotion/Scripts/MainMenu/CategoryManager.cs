@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ManoMotion.UI.Buttons;
+
+/// <summary>
+/// Used to position the icons in the menue from the Category.
+/// </summary>
 public class CategoryManager : MonoBehaviour
 {
 	private static CategoryManager instance;
@@ -18,15 +22,16 @@ public class CategoryManager : MonoBehaviour
 		}
 	}
 
-	public List<UIIconBehavior> uIIconBehaviors = new List<UIIconBehavior>();
-
 	[SerializeField]
 	private GameObject[] categories;
+
+	private List<UIIconBehavior> uIIconBehaviors = new List<UIIconBehavior>();
 
 	private Vector2 categoryPosition;
 	private Category previousCategory;
 
 	private void Awake()
+
 	{
 		if (instance == null)
 		{

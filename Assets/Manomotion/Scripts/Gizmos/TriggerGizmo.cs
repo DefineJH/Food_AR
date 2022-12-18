@@ -2,15 +2,22 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+
+/// <summary>
+/// Handles the visualization of the trigger gizmos.
+/// </summary>
 public class TriggerGizmo : MonoBehaviour
 {
     public float fadeSpeed = 20f;
-    private float currentAlphaValue = 1f;
-    public bool canExpand;
-    public Color clickColor, pickColor, dropColor, grabColor, releaseColor, tapColor;
 
+    private float currentAlphaValue = 1f;
     private Text triggerLabelText;
+
     private Vector3 increaseScaleFactor;
+    public bool canExpand;
+
+    public Color clickColor, pickColor, dropColor, grabColor, releaseColor, swipeColor;
+
     private Vector3 originalScale = Vector3.one * 0.5f;
 
     void OnEnable()
@@ -57,10 +64,10 @@ public class TriggerGizmo : MonoBehaviour
             triggerLabelText = GetComponent<Text>();
         }
 
+
         switch (triggerGesture)
         {
             case ManoGestureTrigger.CLICK:
-
                 triggerLabelText.text = "Click";
                 triggerLabelText.color = clickColor;
                 break;
@@ -79,6 +86,22 @@ public class TriggerGizmo : MonoBehaviour
             case ManoGestureTrigger.RELEASE_GESTURE:
                 triggerLabelText.text = "Release";
                 triggerLabelText.color = releaseColor;
+                break;
+            case ManoGestureTrigger.SWIPE_LEFT:
+                triggerLabelText.text = "Left";
+                triggerLabelText.color = swipeColor;
+                break;
+            case ManoGestureTrigger.SWIPE_RIGHT:
+                triggerLabelText.text = "Right";
+                triggerLabelText.color = swipeColor;
+                break;
+            case ManoGestureTrigger.SWIPE_UP:
+                triggerLabelText.text = "Up";
+                triggerLabelText.color = swipeColor;
+                break;
+            case ManoGestureTrigger.SWIPE_DOWN:
+                triggerLabelText.text = "Down";
+                triggerLabelText.color = swipeColor;
                 break;
         }
     }

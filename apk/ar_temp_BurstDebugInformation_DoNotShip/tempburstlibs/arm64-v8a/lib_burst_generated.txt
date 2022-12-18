@@ -107,12 +107,12 @@ Library: lib_burst_generated
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Timeline.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Burst.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Mathematics.dll
+--root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.XR.ARFoundation.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Analytics.DataPrivacy.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Barracuda.ONNX.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\UnityEngine.XR.LegacyInputHelpers.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.XR.ARCore.dll
---root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.XR.Management.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Subsystem.Registration.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\UnityEngine.SpatialTracking.dll
@@ -368,12 +368,12 @@ Library: lib_burst_generated
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Timeline.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Burst.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Mathematics.dll
+--root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.XR.ARFoundation.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Analytics.DataPrivacy.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Barracuda.ONNX.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\UnityEngine.XR.LegacyInputHelpers.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.XR.ARCore.dll
---root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.XR.Management.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\Unity.Subsystem.Registration.dll
 --root-assembly=C:\Users\JH\Desktop\Projects\Food_AR\Temp\StagingArea\Data\Managed\UnityEngine.SpatialTracking.dll

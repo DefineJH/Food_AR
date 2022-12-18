@@ -1,4 +1,6 @@
-﻿
+﻿/// <summary>
+/// Information sent to the SDK on Init() from ManomotionManager.
+/// </summary>
 public struct ManoSettings
 {
 	public Platform platform;

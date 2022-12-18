@@ -3,10 +3,18 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 
+#if UNITY_IOS
+using UnityEngine.iOS;
+#endif
+
+/// <summary>
+/// Gives information about the license being used.
+/// </summary>
 [AddComponentMenu("ManoMotion/ManoEvents")]
 public class ManoEvents : MonoBehaviour
 {
 	#region Singleton
+
 	protected static ManoEvents _instance;
 	public static ManoEvents Instance
 	{
@@ -20,10 +28,20 @@ public class ManoEvents : MonoBehaviour
 			_instance = value;
 		}
 	}
+
 	#endregion
 
+	/// <summary>
+	/// Animator thats used to display license messages.
+	/// </summary>
 	[SerializeField]
-	Animator statusAnimator;
+	private Animator statusAnimator;
+
+	/// <summary>
+	/// Animator thats used to display lowPowerMode messages.
+	/// </summary>
+	[SerializeField]
+	private Animator lowPowerAnimator;
 
 	private string debugMessage = "";
 
@@ -46,10 +64,16 @@ public class ManoEvents : MonoBehaviour
 		{
 			GameObject.Find("statusAnimator").GetComponent<Animator>();
 			Debug.LogError("The application needs the ManoMotion canvas in order to display status messages through the animator");
-			return;
 		}
 
 		HandleManomotionMessages();
+#if UNITY_IOS
+		CheckForLowPowerMode();
+#endif
+
+#if UNITY_ANDROID
+		CheckForPowerSaverMode();
+#endif
 	}
 
 	/// <summary>
@@ -57,7 +81,7 @@ public class ManoEvents : MonoBehaviour
 	/// </summary>
 	void HandleManomotionMessages()
 	{
-		switch (ManomotionManager.Instance.ManoLicense.license_status)
+		switch (ManomotionManager.Instance.Mano_License.license_status)
 		{
 			case LicenseAnswer.LICENSE_OK:
 				break;
@@ -114,5 +138,64 @@ public class ManoEvents : MonoBehaviour
 		}
 		statusAnimator.Play("SlideIn");
 		statusAnimator.GetComponentInChildren<Text>().text = message;
+	}
+
+
+#if UNITY_IOS
+
+private bool hasShowsLowPowerMode = false;
+	/// <summary>
+	/// Displays Log messages to notify user that LowPowerMode is enabled on the phone.
+	/// </summary>
+    void CheckForLowPowerMode()
+    {
+        if(Device.lowPowerModeEnabled && hasShowsLowPowerMode == false)
+        {
+            StartCoroutine("DispayLowPowerToast", "LowPowerMode Enabled");
+            hasShowsLowPowerMode = true;
+        }
+        if(!Device.lowPowerModeEnabled)
+        {
+            hasShowsLowPowerMode = false;
+        }
+    }
+
+#endif
+
+
+#if UNITY_ANDROID
+
+	private bool hasShowsLowPowerMode = false;
+	/// <summary>
+	/// Displays Log messages to notify user that PawerSaveMode is enabled on the phone.
+	/// </summary>
+	void CheckForPowerSaverMode()
+	{
+		if (ManomotionManager.Instance.Manomotion_Session.flag == Flags.ANDROID_SAVE_BATTERY_ON && hasShowsLowPowerMode == false)
+		{
+			StartCoroutine("DispayLowPowerToast", "PowerSaveMode Enabled");
+			hasShowsLowPowerMode = true;
+		}
+		if (ManomotionManager.Instance.Manomotion_Session.flag != Flags.ANDROID_SAVE_BATTERY_ON)
+		{
+			hasShowsLowPowerMode = false;
+		}
+	}
+
+#endif
+
+	/// <summary>
+	/// Displays the message about LowPowerMode enabled 3 times.
+	/// </summary>
+	/// <param name="message"></param>
+	/// <returns></returns>
+	public IEnumerator DispayLowPowerToast(string message)
+	{
+		lowPowerAnimator.Play("SlideInLow");
+		lowPowerAnimator.GetComponentInChildren<Text>().text = message;
+		yield return new WaitForSeconds(5);
+		lowPowerAnimator.Play("SlideInLow");
+		yield return new WaitForSeconds(5);
+		lowPowerAnimator.Play("SlideInLow");
 	}
 }

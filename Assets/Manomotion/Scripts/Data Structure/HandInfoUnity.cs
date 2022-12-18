@@ -4,12 +4,13 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 
 /// <summary>
-/// Contrains information about the hand
+/// Contains information about the hand
 /// </summary>
-public struct HandInfoUnity
-{
+public struct HandInfoUnity {
+
     /// <summary>
-    /// Information about position
+    /// Information about the hand
     /// </summary>
 	public HandInfo hand_info;
+
 }

@@ -56,11 +56,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdeed4e0ff2134f0984ede47a0aa5b86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bounding_box_prefab: {fileID: 4038065472160262, guid: 3cfbe302e6d4f5646ba1d0aea861efa3,
-    type: 3}
-  _show_bounding_box: 0
-  _showInnerBoundingBox: 0
-  _show_background: 1
   cam: {fileID: 0}
-  manomotionGenericLayer: {fileID: 1438327353568846, guid: 7331c3471c3b27c4084d7378fe751223,
+  manomotionGenericLayerPrefab: {fileID: 1438327353568846, guid: 7331c3471c3b27c4084d7378fe751223,
     type: 3}
+  _showBackgroundLayer: 1

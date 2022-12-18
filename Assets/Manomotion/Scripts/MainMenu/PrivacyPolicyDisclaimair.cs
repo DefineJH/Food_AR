@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-
 namespace ManoMotion.TermsAndServices
 {
     public class PrivacyPolicyDisclaimair : MonoBehaviour
@@ -15,14 +14,22 @@ namespace ManoMotion.TermsAndServices
             Denied = 2
         }
 
-        string playerPrefsPolicy = "Policy";
-
-        [SerializeField]
-        GameObject privacyPolicyCanvas;
-
-        bool hasUserApprovedUse;
-
         public event Action OnHasApprovedPrivacyPolicy;
+
+        private string playerPrefsPolicy = "Policy";
+        [SerializeField]
+        private GameObject privacyPolicyCanvas;
+        private bool hasUserApprovedUse;
+
+        private void Awake()
+        {
+            if (!PlayerPrefs.HasKey(playerPrefsPolicy))
+            {
+                PlayerPrefs.SetInt(playerPrefsPolicy, 0);
+            }
+
+            RetrievePrivacyHistory();
+        }
 
         /// <summary>
         /// Initializes the usage disclaimer.
@@ -34,6 +41,7 @@ namespace ManoMotion.TermsAndServices
             {
                 privacyPolicyCanvas = GameObject.Find(canvasName);
             }
+
             RetrievePrivacyHistory();
 
             if (hasUserApprovedUse)
@@ -53,7 +61,7 @@ namespace ManoMotion.TermsAndServices
         {
             if (PlayerPrefs.HasKey(playerPrefsPolicy))
             {
-                hasUserApprovedUse = PlayerPrefs.GetInt(playerPrefsPolicy) == (int)AccessState.Granted;
+                hasUserApprovedUse = PlayerPrefs.GetInt(playerPrefsPolicy) == (int)AccessState.Granted;               
                 if (hasUserApprovedUse)
                 {
                     ApprovePrivacyPolicy();
@@ -63,13 +71,11 @@ namespace ManoMotion.TermsAndServices
                     Debug.Log("User has they key but has not approved the policy");
                     Debug.LogFormat("The value of hasUserApprovedUse is {0}", hasUserApprovedUse);
                 }
-
             }
             else
             {
                 hasUserApprovedUse = false;
                 PlayerPrefs.SetInt(playerPrefsPolicy, (int)AccessState.ShouldAsk);
-
             }
         }
 
@@ -89,7 +95,10 @@ namespace ManoMotion.TermsAndServices
         {
             PlayerPrefs.SetInt(playerPrefsPolicy, (int)AccessState.Granted);
             hasUserApprovedUse = PlayerPrefs.GetInt(playerPrefsPolicy) == (int)AccessState.Granted;
+            PlayerPrefs.Save();
+
             ClosePrivacyPolicy();
+
             if (OnHasApprovedPrivacyPolicy != null)
             {
                 OnHasApprovedPrivacyPolicy();
@@ -97,7 +106,7 @@ namespace ManoMotion.TermsAndServices
             }
             else
             {
-                Debug.Log("Nobody is listening");
+                Debug.Log("No one is listening");
             }
         }
 
@@ -118,3 +127,4 @@ namespace ManoMotion.TermsAndServices
         }
     }
 }
+

@@ -61,7 +61,6 @@ public class StartExperienceController : MonoBehaviour{
     IEnumerator HideTapToSpawnUI() {
         yield return new WaitForSeconds(hideAfterSeconds);
 
-        GameManager.Instance.Initalize();
     }
 
     #endregion

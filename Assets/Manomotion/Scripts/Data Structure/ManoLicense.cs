@@ -27,7 +27,9 @@ public enum LicenseAnswer
 public struct ManoLicense
 {
     public LicenseAnswer license_status;
+    /// The number of devices left for the license to be installed on. 
     public int machines_left;
     public int days_left;
+    /// The version of the SDK.
     public float version;
 }

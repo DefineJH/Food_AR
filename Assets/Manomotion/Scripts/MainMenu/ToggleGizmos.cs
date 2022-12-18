@@ -2,14 +2,48 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Toggles which gizmos to show or hide.
+/// </summary>
 public class ToggleGizmos : MonoBehaviour
 {
-
-    private GizmoManager _gizmoManager;
+    GizmoManager _gizmoManager;
 
     private void Start()
     {
         _gizmoManager = GetComponent<GizmoManager>();
+    }
+
+    /// <summary>
+    /// Toggles the boolean value of showing the Grab and Release triggers.
+    /// </summary>
+    public void ToggleShowGrabRelease()
+    {
+        _gizmoManager.ShowGrabRelease = !_gizmoManager.ShowGrabRelease;
+    }
+
+    /// <summary>
+    /// Toggles the boolean value of showing the Pick and Drop triggers.
+    /// </summary>
+    public void ToggleSHowPickDrop()
+    {
+        _gizmoManager.ShowPickDrop = !_gizmoManager.ShowPickDrop;
+    }
+
+    /// <summary>
+    /// Toggles the boolean value of showing the Swipe triggers.
+    /// </summary>
+    public void ToggleShowSwipes()
+    {
+        _gizmoManager.ShowSwipes = !_gizmoManager.ShowSwipes;
+    }
+
+    /// <summary>
+    /// Toggles the boolean value of showing the Gesture Analysis Information.
+    /// </summary>
+    public void ToggleShowGestureAnalysis()
+    {
+        _gizmoManager.ShowGestureAnalysis = !_gizmoManager.ShowGestureAnalysis;
     }
 
     /// <summary>
@@ -26,24 +60,6 @@ public class ToggleGizmos : MonoBehaviour
     public void ToggleShowManoclass()
     {
         _gizmoManager.ShowManoClass = !_gizmoManager.ShowManoClass;
-    }
-
-    /// <summary>
-    /// Toggles the boolean value of showing the cursor that follows the bounding box center;
-    /// </summary>
-    public void ToggleShowPalmCenter()
-    {
-        _gizmoManager.ShowPalmCenter = !_gizmoManager.ShowPalmCenter;
-    }
-
-    /// <summary>
-    /// Toggles the boolean value of showing the cursor that follows the bounding box center;
-    /// By toggling the value it will also updatre the manomotion session to start calculating it or not.
-    /// </summary>
-    public void ToggleShowPOI()
-    {
-        _gizmoManager.ShowPOI = !_gizmoManager.ShowPOI;
-        ManomotionManager.Instance.ShouldCalculatePOI(_gizmoManager.ShowPOI);
     }
 
     /// <summary>
@@ -87,6 +103,22 @@ public class ToggleGizmos : MonoBehaviour
     }
 
     /// <summary>
+    /// Toggles the boolean value of showing Vertical (Up & Down) Swipe triggers.
+    /// </summary>
+    public void ToggleShowSwipeVerticalTriggerGesture()
+    {
+        _gizmoManager.ShowSwipeVerticalTriggerGesture = !_gizmoManager.ShowSwipeVerticalTriggerGesture;
+    }
+
+    /// <summary>
+    /// Toggles the boolean value of showing Horizontal (Left & Right) Swipe triggers.
+    /// </summary>
+    public void ToggleShowSwipeHorizontalTriggerGesture()
+    {
+        _gizmoManager.ShowSwipeHorizontalTriggerGesture = !_gizmoManager.ShowSwipeHorizontalTriggerGesture;
+    }
+
+    /// <summary>
     /// Toggles the boolean value of showing Grab Trigger Gesture
     /// </summary>
     public void ToggleShowGrabTriggerGesture()
@@ -105,6 +137,7 @@ public class ToggleGizmos : MonoBehaviour
     /// <summary>
     /// Toggles the show smoothing slider condition.
     /// </summary>
+    /// 
     public void ToggleShowSmoothingSlider()
     {
         _gizmoManager.ShowSmoothingSlider = !_gizmoManager.ShowSmoothingSlider;
@@ -124,5 +157,65 @@ public class ToggleGizmos : MonoBehaviour
     public void ToggleShowDepthEstimation()
     {
         _gizmoManager.ShowDepthEstimation = !_gizmoManager.ShowDepthEstimation;
+    }
+
+    /// <summary>
+    /// Toggles the boolean value of geting the skeleton points in 3D or 2D.
+    /// By toggling the value it will also update the manomotion session to start calculating it or not.
+    /// </summary>
+    public void ToggleShow3DSkeleton()
+    {
+        _gizmoManager.ShowSkeleton3d = !_gizmoManager.ShowSkeleton3d;
+        ManomotionManager.Instance.ShouldCalculateSkeleton3D(_gizmoManager.ShowSkeleton3d);
+    }
+
+    /// <summary>
+    /// Toggles the boolean value of make use of gestures, trigger and continious.
+    /// By toggling the value it will also update the manomotion session to start calculating it or not.
+    /// </summary>
+    public void ToggleShowGestures()
+    {
+        _gizmoManager.ShowGestures = !_gizmoManager.ShowGestures;
+        ManomotionManager.Instance.ShouldCalculateGestures(_gizmoManager.ShowGestures);
+    }
+
+    /// <summary>
+    /// Toggles the boolean value of make use of fast mode.
+    /// By toggling the value it will also update the manomotion session to start calculating it or not.
+    /// </summary>
+    public void ToggleFastMode()
+    {
+        _gizmoManager.Fastmode = !_gizmoManager.Fastmode;
+        ManomotionManager.Instance.ShouldRunFastMode(_gizmoManager.Fastmode);
+    }
+
+    /// <summary>
+    /// Toggles the boolean value of showing wrist information.
+    /// By toggling the value it will also update the manomotion session to start calculating it or not.
+    /// </summary>
+    public void ToggleShowWristInfo()
+    {
+        _gizmoManager.ShowWristInfo = !_gizmoManager.ShowWristInfo;
+        ManomotionManager.Instance.ShouldRunWristInfo(_gizmoManager.ShowWristInfo);
+    }
+
+    /// <summary>
+    /// Toggles the boolean value of showing finger information.
+    /// By toggling the value it will also update the manomotion session to start calculating it or not.
+    /// </summary>
+    public void ToggleShowFingerInfo()
+    {
+        _gizmoManager.ShowFingerInfo = !_gizmoManager.ShowFingerInfo;
+        ManomotionManager.Instance.ShouldRunFingerInfo(_gizmoManager.ShowFingerInfo);
+    }
+
+    /// <summary>
+    /// Toggles the boolean value of showing hand Contour.
+    /// By toggling the value it will also update the manomotion session to start calculating it or not.
+    /// </summary>
+    public void ToggleShowControur()
+    {
+        _gizmoManager.ShowContour = !_gizmoManager.ShowContour;
+        ManomotionManager.Instance.ShouldRunContour(_gizmoManager.ShowContour);
     }
 }

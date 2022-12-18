@@ -16,31 +16,22 @@ public enum Warning
 };
 
 /// <summary>
-/// The Hand value provides additional information regarding the classification of the hand regarding if its a right or a left hand
-/// </summary>
-public enum Hand
-{
-    LEFT = 0,
-    RIGHT = 1,
-};
-
-/// <summary>
-/// Contrains information about the hand
+/// Contains information about the hand.
 /// </summary>
 public struct HandInfo
 {
     /// <summary>
-    /// Information about position
+    /// Information about hand position.
     /// </summary>
     public TrackingInfo tracking_info;
 
     /// <summary>
-    /// Information about gesture
+    /// Information about hand gestures.
     /// </summary>
     public GestureInfo gesture_info;
 
     /// <summary>
-    /// Warnings of conditions that could mean problems on detection
+    /// Warnings of conditions that could mean problems on detection.
     /// </summary>
     public Warning warning;
 }

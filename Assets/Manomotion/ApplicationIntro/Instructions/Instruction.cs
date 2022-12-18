@@ -24,6 +24,7 @@ public abstract class Instruction : MonoBehaviour
     {
         return _stepInstructions;
     }
+
     /// <summary>
     /// Gets the step instructions.
     /// </summary>
@@ -32,8 +33,8 @@ public abstract class Instruction : MonoBehaviour
     virtual public string GetStepInstructions(int step)
     {
         return _stepInstructions[step];
-
     }
+
     /// <summary>
     /// Gets the instruction canvas text.
     /// </summary>
@@ -42,6 +43,7 @@ public abstract class Instruction : MonoBehaviour
     {
         return _howToInstruction;
     }
+
     /// <summary>
     /// Gets the instruction card text.
     /// </summary>
@@ -50,6 +52,7 @@ public abstract class Instruction : MonoBehaviour
     {
         return _cardText;
     }
+
     /// <summary>
     /// Gets the instruction identifier.
     /// </summary>
@@ -58,6 +61,7 @@ public abstract class Instruction : MonoBehaviour
     {
         return _instructionID;
     }
+
     /// <summary>
     /// Gets the instruction card title.
     /// </summary>
@@ -83,6 +87,7 @@ public abstract class Instruction : MonoBehaviour
     {
         _instructionSeen = true;
     }
+
     /// <summary>
     /// Declares the instruction not seen.
     /// </summary>
@@ -98,6 +103,7 @@ public abstract class Instruction : MonoBehaviour
     {
         _instructionPerformed = true;
     }
+
     /// <summary>
     /// Progresses the with instruction step.
     /// </summary>
@@ -105,6 +111,7 @@ public abstract class Instruction : MonoBehaviour
     {
 
     }
+
     /// <summary>
     /// Instructions the behavior.
     /// </summary>
@@ -112,13 +119,13 @@ public abstract class Instruction : MonoBehaviour
     {
 
     }
+
     /// <summary>
     /// Guides the how to.
     /// </summary>
     virtual public void GuideHowTo()
     {
         this._shouldRespondToUserInput = true;
-
     }
 
     /// <summary>
@@ -127,6 +134,5 @@ public abstract class Instruction : MonoBehaviour
     virtual public void StopResponding()
     {
         this._shouldRespondToUserInput = false;
-
     }
 }

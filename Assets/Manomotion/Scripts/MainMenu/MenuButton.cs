@@ -4,13 +4,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 
+/// <summary>
+/// The button that open and close the Main Menu.
+/// </summary>
 public class MenuButton : MonoBehaviour
 {
     [SerializeField]
-    private GameObject iconsCanvas, manomotionCanvas;
+    GameObject iconsCanvas, manomotionCanvas;
 
     [SerializeField]
-    private Sprite menuOpenImage, menuClosedImage;
+    Sprite menuOpenImage, menuClosedImage;
 
     public Image buttonImage;
 
@@ -27,6 +30,7 @@ public class MenuButton : MonoBehaviour
             _menuIsOpen = value;
         }
     }
+
 
     void Start()
     {
@@ -46,6 +50,7 @@ public class MenuButton : MonoBehaviour
         {
             buttonImage.sprite = menuOpenImage;
         }
+
         else
         {
             buttonImage.sprite = menuClosedImage;

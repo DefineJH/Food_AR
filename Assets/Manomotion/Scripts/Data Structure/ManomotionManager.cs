@@ -1,25 +1,28 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
 using UnityEngine.UI;
+using System;
 
-#if UNITY_ANDROID	
-using UnityEngine.Android;
-#endif
 #if UNITY_IOS
 using UnityEngine.iOS;
 #endif
 
+/// <summary>
+/// The ManomotionManager handles the communication with the SDK.
+/// </summary>
 [AddComponentMenu("ManoMotion/ManoMotion Manager")]
 [RequireComponent(typeof(ManoEvents))]
 public class ManomotionManager : ManomotionBase
 {
     #region Events
 
+    ///Sends information after each frame is processed by the SDK.
     public static Action OnManoMotionFrameProcessed;
+    ///Sends information after the license is checked by the SDK.
     public static Action OnManoMotionLicenseInitialized;
+    ///Sends information when changing between 2D and 3D joints
+    public static Action<int, int> OnSkeleton3dActive;
 
     #endregion
 
@@ -27,39 +30,45 @@ public class ManomotionManager : ManomotionBase
     protected static ManomotionManager instance;
     #endregion
 
-    #region Variables
+    #region variables
+    /// The information about the hand
     protected HandInfoUnity[] hand_infos;
     protected VisualizationInfo visualization_info;
+    /// The information about the Session values, the SDK settings
     protected Session manomotion_session;
 
-    protected int widthValue;
-    protected int heightValue;
-    protected int fps;
-    protected int processingTime;
+    /// the width of the images processed
+    protected int _width;
+    /// the height of the images processed
+    protected int _height;
+    protected int _fps;
+    protected int _processing_time;
 
+    private bool _initialized;
     private float fpsCooldown = 0;
     private int frameCount = 0;
+    /// Stores the processing time values
     private List<int> processing_time_list = new List<int>();
 
+    /// Frame pixels
     protected Color32[] framePixelColors;
+    /// Frame pixels
+    protected Color32[] MRframePixelColors;
     protected ManoLicense _manoLicense;
 
     protected ManoSettings _manoSettings;
     protected ImageFormat currentImageFormat;
-
-    private bool initialized;
-    private bool hasCameraPermissions, externalRead, externalWrite;
 
     #endregion
 
     #region imports
 
 #if UNITY_IOS
-    const string library = "__Internal";
+	const string library = "__Internal";
 #elif UNITY_ANDROID
     const string library = "manomotion";
 #else
-    const string library = "manomotion";
+	const string library = "manomotion";
 #endif
 
 
@@ -70,18 +79,22 @@ public class ManomotionManager : ManomotionBase
     private static extern void setFrameArray(Color32[] frame);
 
     [DllImport(library)]
+    private static extern void setMRFrameArray(Color32[] frame);
+
+    [DllImport(library)]
     private static extern void setResolution(int width, int height);
 
     [DllImport(library)]
     private static extern void stop();
 
     [DllImport(library)]
-    private static extern ManoLicense init(ManoSettings settings);
+    private static extern void init(ManoSettings settings, ref ManoLicense mano_license);
 
     #endregion
 
-    #region Init Wrapper Methods
+    #region init_wrappers
 
+    /// Stops the SDK from processing.
     public void StopProcessing()
     {
 #if !UNITY_EDITOR
@@ -89,19 +102,32 @@ public class ManomotionManager : ManomotionBase
 #endif
     }
 
+    /// Sends the resolution values to the SDK.
     protected void SetResolution(int width, int height)
     {
+        Debug.Log("Set resolution " + width + "," + height);
 #if !UNITY_EDITOR
 
         setResolution(width, height);
 #endif
     }
 
+    /// Gives instruction where frame pixels are stored.
     protected void SetFrameArray(Color32[] pixels)
     {
-
+        //Debug.Log("Called setFrameArray with " + pixels.Length);
 #if !UNITY_EDITOR
         setFrameArray(pixels);
+
+#endif
+    }
+
+    /// Gives instruction where frame pixels are stored.
+    protected void SetMRFrameArray(Color32[] pixels)
+    {
+        Debug.Log("Called setMRFrameArray with " + pixels.Length);
+#if !UNITY_EDITOR
+        setMRFrameArray(pixels);
 
 #endif
     }
@@ -109,21 +135,19 @@ public class ManomotionManager : ManomotionBase
     #endregion
 
     #region Propperties
-
     internal int Processing_time
     {
         get
         {
-            return processingTime;
+            return _processing_time;
         }
-
     }
 
     internal int Fps
     {
         get
         {
-            return fps;
+            return _fps;
         }
     }
 
@@ -131,7 +155,7 @@ public class ManomotionManager : ManomotionBase
     {
         get
         {
-            return heightValue;
+            return _height;
         }
     }
 
@@ -139,7 +163,7 @@ public class ManomotionManager : ManomotionBase
     {
         get
         {
-            return widthValue;
+            return _width;
         }
     }
 
@@ -157,8 +181,6 @@ public class ManomotionManager : ManomotionBase
         {
             return hand_infos;
         }
-
-
     }
 
     public Session Manomotion_Session
@@ -171,7 +193,6 @@ public class ManomotionManager : ManomotionBase
         {
             manomotion_session = value;
         }
-
     }
 
     public static ManomotionManager Instance
@@ -180,9 +201,8 @@ public class ManomotionManager : ManomotionBase
         {
             return instance;
         }
-
-
     }
+
     public string LicenseKey
     {
         get
@@ -196,7 +216,7 @@ public class ManomotionManager : ManomotionBase
         }
     }
 
-    public ManoLicense ManoLicense
+    public ManoLicense Mano_License
     {
         get
         {
@@ -222,21 +242,19 @@ public class ManomotionManager : ManomotionBase
 
     #endregion
 
-    #region Awake Start
+    #region Awake/Start
 
     protected virtual void Awake()
     {
         if (instance == null)
         {
-            transform.GetComponent<InputManagerArFoundation>().StoragePermisionCheck();
+            instance = this;
             ManoUtils.OnOrientationChanged += HandleOrientationChanged;
             InputManagerBaseClass.OnAddonSet += HandleAddOnSet;
-            InputManagerBaseClass.OnFrameInitialized += HandleManoMotionFrameInitialized;
-            InputManagerBaseClass.OnFrameUpdated += HandleNewFrame;
-            InputManagerBaseClass.OnFrameResized += HandleManoMotionFrameResized;
-            instance = this;
+            InputManagerPhoneCamera.OnFrameInitialized += HandleManoMotionFrameInitialized;
+            InputManagerPhoneCamera.OnFrameUpdated += HandleNewFrame;
+            InputManagerPhoneCamera.OnFrameResized += HandleManoMotionFrameResized;
         }
-
         else
         {
             this.gameObject.SetActive(false);
@@ -244,22 +262,39 @@ public class ManomotionManager : ManomotionBase
         }
     }
 
-    private void HandleAddOnSet(AddOn addon)
+    /// <summary>
+    /// Respond to the event of a ManoMotionFrame resized.
+    /// </summary>
+    /// <param name="newFrame">The new frame to process</param>
+    void HandleManoMotionFrameResized(ManoMotionFrame newFrame)
     {
-        InstantiateSession();
-        manomotion_session.add_on = addon;
+        SetResolutionValues(newFrame.width, newFrame.height);
+    }
+
+    /// <summary>
+    /// Respond to the event of a ManoMotionFrame being initialized.
+    /// </summary>
+    /// <param name="newFrame">The new frame to process</param>
+    void HandleManoMotionFrameInitialized(ManoMotionFrame newFrame)
+    {
+        SetResolutionValues(newFrame.width, newFrame.height);
+        InstantiateVisualisationInfo();
+    }
+
+    /// <summary>
+    /// Respond to the event of a ManoMotionFrame being sent for processing.
+    /// </summary>
+    /// <param name="newFrame">The new frame to process</param>
+    void HandleNewFrame(ManoMotionFrame newFrame)
+    {
+        GetCameraFramePixelColors(newFrame);
+        UpdateTexturesWithNewInfo();
     }
 
     protected void Start()
     {
-#if UNITY_ANDROID
-        hasCameraPermissions = Permission.HasUserAuthorizedPermission(Permission.Camera);
-        externalRead = Permission.HasUserAuthorizedPermission(Permission.ExternalStorageRead);
-        externalWrite = Permission.HasUserAuthorizedPermission(Permission.ExternalStorageWrite);
-        this.gameObject.SetActive(externalWrite && externalRead);
-#endif
         SetManoMotionSettings(ImageFormat.BGRA_FORMAT, _licenseKey);
-
+        InstantiateSession();
         InstantiateHandInfos();
         InitiateLibrary();
         SetUnityConditions();
@@ -268,12 +303,13 @@ public class ManomotionManager : ManomotionBase
     /// <summary>
     /// Fills in the information needed in the manosettings Struct in order to initialize ManoMotion Tech.
     /// </summary>
+    /// <param name="newPlatform">Requires the platform the app is going to be used in.</param>
     /// <param name="newImageFormat">Requires the image format that ManoMotion tech is going to process</param>
     /// <param name="newLicenseKey">Requires a Serial Key that is valid for ManoMotion tech and it linked with the current boundle ID used in the application.</param>
     public void SetManoMotionSettings(ImageFormat newImageFormat, string newLicenseKey)
     {
 #if UNITY_IOS
-        _manoSettings.platform = Platform.UNITY_IOS;
+		_manoSettings.platform = Platform.UNITY_IOS;
 #endif
 
 #if UNITY_ANDROID
@@ -284,15 +320,50 @@ public class ManomotionManager : ManomotionBase
     }
 
     /// <summary>
-    /// Instantiates the manager info.
+    /// Sets the resolution values used throughout the initialization methods of the arrays and textures.
+    /// </summary>
+    /// <param name="width">Requires a width value.</param>
+    /// <param name="height">Requires a height value.</param>
+    protected override void SetResolutionValues(int width, int height)
+    {
+        _width = width;
+        _height = height;
+        SetResolution(width, height);
+
+        visualization_info.rgb_image = new Texture2D(_width, _height);
+        framePixelColors = new Color32[_width * height];
+        SetFrameArray(framePixelColors);
+
+        visualization_info.occlussion_rgb = new Texture2D(_width, _height);
+        MRframePixelColors = new Color32[_width * height];
+        SetMRFrameArray(MRframePixelColors);
+    }
+
+    /// <summary>
+    /// Instantiates the SDK Settings information.
     /// </summary>
     protected override void InstantiateSession()
     {
         manomotion_session = new Session();
         manomotion_session.orientation = ManoUtils.Instance.currentOrientation;
+        manomotion_session.add_on = AddOn.ARFoundation;
         manomotion_session.smoothing_controller = 0.15f;
-        manomotion_session.gesture_smoothing_controller = 0.5f;
-        manomotion_session.enabled_features.pinch_poi = 1;
+        manomotion_session.gesture_smoothing_controller = 0.65f;
+        manomotion_session.enabled_features.gestures = 0;
+        manomotion_session.enabled_features.skeleton_3d = 0;
+        manomotion_session.enabled_features.fast_mode = 0;
+        manomotion_session.enabled_features.wrist_info = 0;
+        manomotion_session.enabled_features.finger_info = 0;
+        manomotion_session.enabled_features.contour = 0;
+    }
+
+    /// <summary>
+    /// Gets the correct manomotion_session addon from the inputManager
+    /// </summary>
+    /// <param name="addon">The addon used with the inputManager</param>
+    private void HandleAddOnSet(AddOn addon)
+    {
+        manomotion_session.add_on = addon;
     }
 
     /// <summary>
@@ -314,6 +385,16 @@ public class ManomotionManager : ManomotionBase
     }
 
     /// <summary>
+    /// Instantiates the visualisation info.
+    /// </summary>
+    private void InstantiateVisualisationInfo()
+    {
+        visualization_info = new VisualizationInfo();
+        visualization_info.rgb_image = new Texture2D(_width, _height);
+        visualization_info.occlussion_rgb = new Texture2D(_width, _height);
+    }
+
+    /// <summary>
     /// Initiates the library.
     /// </summary>
     protected void InitiateLibrary()
@@ -329,14 +410,7 @@ public class ManomotionManager : ManomotionBase
             LicenseKey = removeExtraCharactersAndSpaceString;
         }
 
-#if UNITY_ANDROID
-        if (externalRead && externalWrite)
-        {
-            Init(LicenseKey);
-        }
-#else
         Init(LicenseKey);
-#endif
     }
 
     /// <summary>
@@ -350,62 +424,62 @@ public class ManomotionManager : ManomotionBase
 
     #endregion
 
-    #region methods
+    #region update_methods
 
-    /// <summary>
-    /// Respond to the event of a ManoMotionFrame resized.
-    /// </summary>
-    /// <param name="newFrame"></param>
-    void HandleManoMotionFrameResized(ManoMotionFrame newFrame)
+    protected void Update()
     {
-        SetResolutionValues(newFrame.width, newFrame.height);
+        if (_initialized)
+        {
+            CalculateFPSAndProcessingTime();
+        }
     }
 
     /// <summary>
-    /// Respond to the event of a ManoMotionFrame being initialized.
+    /// Updates the orientation information as captured from the device to the Session
     /// </summary>
-    /// <param name="newFrame"></param>
-    void HandleManoMotionFrameInitialized(ManoMotionFrame newFrame)
+    protected void HandleOrientationChanged()
     {
-        SetResolutionValues(newFrame.width, newFrame.height);
-        InstantiateVisualisationInfo();
+        Debug.Log("orientation changed");
+        manomotion_session.orientation = ManoUtils.Instance.currentOrientation;
     }
 
     /// <summary>
-    /// Picks the resolution.
+    /// Updates the RGB Frame of Visualization Info with the pixels captured from the camera.
     /// </summary>
-    /// <param name="width">Requires a width value.</param>
-    /// <param name="height">Requires a height value.</param>
-    protected override void SetResolutionValues(int width, int height)
+    protected override void UpdateTexturesWithNewInfo()
     {
-        this.widthValue = width;
-        this.heightValue = height;
+        if (framePixelColors.Length > 255)
+        {
+            if (visualization_info.rgb_image.width * visualization_info.rgb_image.height == framePixelColors.Length)
+            {
+                visualization_info.rgb_image.SetPixels32(framePixelColors);
+                visualization_info.rgb_image.Apply();
+                ProcessManomotion();
 
-        SetResolution(width, height);
+                if (OnManoMotionFrameProcessed != null)
+                {
+                    OnManoMotionFrameProcessed();
+                }
+            }
+            else
+            {
+                Debug.LogErrorFormat("UpdateTexturesWithNewInfo error rgb_image width {0} height{1} framepixelcolors length {2}", visualization_info.rgb_image.width, visualization_info.rgb_image.height, framePixelColors.Length);
+            }
 
-        visualization_info.rgb_image = new Texture2D(this.widthValue, this.heightValue);
-        framePixelColors = new Color32[this.widthValue * this.heightValue];
-
-        SetFrameArray(framePixelColors);
-    }
-
-    /// <summary>
-    /// Instantiates the visualisation info.
-    /// </summary>
-    private void InstantiateVisualisationInfo()
-    {
-        visualization_info = new VisualizationInfo();
-        visualization_info.rgb_image = new Texture2D(widthValue, heightValue);
-    }
-
-    /// <summary>
-    /// Respond to the event of a ManoMotionFrame being sent for processing.
-    /// </summary>
-    /// <param name="newFrame"></param>
-    void HandleNewFrame(ManoMotionFrame newFrame)
-    {
-        GetCameraFramePixelColors(newFrame);
-        UpdateTexturesWithNewInfo();
+            if (visualization_info.occlussion_rgb.width * visualization_info.occlussion_rgb.height == MRframePixelColors.Length)
+            {
+                visualization_info.occlussion_rgb.SetPixels32(MRframePixelColors);
+                visualization_info.occlussion_rgb.Apply();
+            }
+            else
+            {
+                Debug.LogErrorFormat("UpdateTexturesWithNewInfo error MRFrame width {0} height{1} MRframepixelcolors length {2}", visualization_info.rgb_image.width, visualization_info.rgb_image.height, framePixelColors.Length);
+            }
+        }
+        else
+        {
+            Debug.LogError("Frame Pixel colors error");
+        }
     }
 
     /// <summary>
@@ -413,8 +487,11 @@ public class ManomotionManager : ManomotionBase
     /// </summary>
     protected void GetCameraFramePixelColors(ManoMotionFrame newFrame)
     {
-        if (framePixelColors.Length != newFrame.pixels.Length || visualization_info.rgb_image.width != newFrame.texture.width || visualization_info.rgb_image.height != newFrame.texture.height)
+        if (framePixelColors.Length != newFrame.pixels.Length ||
+            visualization_info.rgb_image.width != newFrame.texture.width ||
+            visualization_info.rgb_image.height != newFrame.texture.height)
         {
+            Debug.LogError("GetCameraFramePixelColors lengths were not matching, called resize");
             SetResolutionValues(newFrame.width, newFrame.height);
         }
         try
@@ -428,110 +505,19 @@ public class ManomotionManager : ManomotionBase
     }
 
     /// <summary>
-    /// Updates the RGB Frame of Visualization Info with the pixels captured from the camera.
-    /// </summary>
-    protected override void UpdateTexturesWithNewInfo()
-    {
-        if (framePixelColors.Length > 255)
-        {
-            if (visualization_info.rgb_image.width * visualization_info.rgb_image.height == framePixelColors.Length)
-            {
-                SetFrameArray(framePixelColors);
-
-                ProcessManomotion();
-
-                visualization_info.rgb_image.SetPixels32(framePixelColors);
-                visualization_info.rgb_image.Apply();
-
-                if (OnManoMotionFrameProcessed != null)
-                {
-                    OnManoMotionFrameProcessed();
-                }
-            }
-            else
-            {
-                Debug.LogErrorFormat("UpdateTexturesWithNewInfo error rgb_image width {0} height{1} framepixelcolors length {2}", visualization_info.rgb_image.width, visualization_info.rgb_image.height, framePixelColors.Length);
-            }
-        }
-        else
-        {
-            Debug.LogError("Frame Pixel colors error");
-        }
-    }
-
-    /// <summary>
-    /// Lets the core know that it needs to calculate the Point of Interaction.
-    /// </summary>
-    /// <param name="condition"></param>
-    public void ShouldCalculatePOI(bool condition)
-    {
-        if (condition)
-        {
-            manomotion_session.enabled_features.pinch_poi = 1;
-        }
-        else
-        {
-            manomotion_session.enabled_features.pinch_poi = 0;
-        }
-    }
-
-    /// <summary>
-    /// Sets the mano motion smoothing value throught the gizmo slider, the bigger the value the stronger the smoothing.
-    /// </summary>
-    /// <param name="slider">Slider.</param>
-    public void SetManoMotionSmoothingValue(Slider slider)
-    {
-        manomotion_session.smoothing_controller = slider.value;
-    }
-
-    /// <summary>
-    /// Sets the mano motion gesture smoothing value throught the gizmo slider, the bigger the value the stronger the smoothing.
-    /// </summary>
-    /// <param name="slider">Slider.</param>
-    public void SetManoMotionGestureSmoothingValue(Slider slider)
-    {
-        manomotion_session.gesture_smoothing_controller = slider.value;
-    }
-
-    #endregion
-
-    #region update_methods
-
-    protected void Update()
-    {
-        if (initialized)
-        {
-            CalculateFPSAndProcessingTime();
-        }
-    }
-
-    /// <summary>
-    /// Updates the orientation information as captured from the device to the Session
-    /// </summary>
-    protected void HandleOrientationChanged()
-    {
-        manomotion_session.orientation = ManoUtils.Instance.currentOrientation;
-    }
-
-    /// <summary>
-    /// Evaluates the dimension of the pixel color array and if it matches the dimensions proceeds with Processing the Frame. 
+    /// Evaluates the dimension of the pixel color array and if it matches the dimensions proceeds with Processing the Frame.
+    /// And adds the processing time to the processing_time_list.
     /// </summary>
     protected override void ProcessManomotion()
     {
         if (framePixelColors.Length == Width * Height)
         {
-            try
-            {
-                long start = System.DateTime.UtcNow.Millisecond + System.DateTime.UtcNow.Second * 1000 + System.DateTime.UtcNow.Minute * 60000;
-                ProcessFrame();
-                long end = System.DateTime.UtcNow.Millisecond + System.DateTime.UtcNow.Second * 1000 + System.DateTime.UtcNow.Minute * 60000;
-                if (start < end)
-                    processing_time_list.Add((int)(end - start));
-            }
-            catch (System.Exception ex)
-            {
-                Debug.Log("exeption: " + ex.ToString());
-            }
+            SetFrameArray(framePixelColors);
+            long start = System.DateTime.UtcNow.Millisecond + System.DateTime.UtcNow.Second * 1000 + System.DateTime.UtcNow.Minute * 60000;
+            ProcessFrame();
+            long end = System.DateTime.UtcNow.Millisecond + System.DateTime.UtcNow.Second * 1000 + System.DateTime.UtcNow.Minute * 60000;
+            if (start < end)
+                processing_time_list.Add((int)(end - start));
         }
         else
         {
@@ -548,7 +534,7 @@ public class ManomotionManager : ManomotionBase
         frameCount++;
         if (fpsCooldown >= 1)
         {
-            fps = frameCount;
+            _fps = frameCount;
             frameCount = 0;
             fpsCooldown -= 1;
             CalculateProcessingTime();
@@ -568,8 +554,150 @@ public class ManomotionManager : ManomotionBase
                 sum += processing_time_list[i];
             }
             sum /= processing_time_list.Count;
-            processingTime = sum;
+            _processing_time = sum;
             processing_time_list.Clear();
+        }
+    }
+
+    /// <summary>
+    /// Sets the ManoMotion tracking smoothing value throught the gizmo slider, the bigger the value the stronger the smoothing.
+    /// </summary>
+    /// <param name="slider">Slider.</param>
+    public void SetManoMotionSmoothingValue(Slider slider)
+    {
+        manomotion_session.smoothing_controller = slider.value;
+    }
+
+    /// <summary>
+    /// Lets the SDK know if it should calculate the Skeleton in 3D or 2D.
+    /// And gives information to SkeletonManager which skeleton model to display.
+    /// </summary>
+    /// <param name="condition">run or not</param>
+    public void ShouldCalculateSkeleton3D(bool condition)
+    {
+        if (condition)
+        {
+            manomotion_session.enabled_features.skeleton_3d = 1;
+
+            if (OnSkeleton3dActive != null)
+            {
+                OnSkeleton3dActive(1, 0);
+            }
+        }
+        else
+        {
+            manomotion_session.enabled_features.skeleton_3d = 0;
+
+            if (OnSkeleton3dActive != null)
+            {
+                OnSkeleton3dActive(0, 1);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Lets the SDK know that it needs to calculate the Gestures.
+    /// </summary>
+    /// <param name="condition">run or not</param>
+    public void ShouldCalculateGestures(bool condition)
+    {
+        if (condition)
+        {
+            manomotion_session.enabled_features.gestures = 1;
+        }
+        else
+        {
+            manomotion_session.enabled_features.gestures = 0;
+        }
+    }
+
+    /// <summary>
+    /// Lets the SDK know if it should run fast mode or not.
+    /// </summary>
+    /// <param name="condition">run or not</param>
+    public void ShouldRunFastMode(bool condition)
+    {
+        if (condition)
+        {
+            manomotion_session.enabled_features.fast_mode = 1;
+        }
+        else
+        {
+            manomotion_session.enabled_features.fast_mode = 0;
+        }
+    }
+
+    /// <summary>
+    /// Lets the SDK know if it should calculate wrist information.
+    /// </summary>
+    /// <param name="condition">run or not</param>
+    public void ShouldRunWristInfo(bool condition)
+    {
+        if (condition)
+        {
+            manomotion_session.enabled_features.wrist_info = 1;
+        }
+        else
+        {
+            manomotion_session.enabled_features.wrist_info = 0;
+        }
+    }
+
+    /// <summary>
+    /// Lets the SDK know if it should calculate finger information.
+    /// 4 will run the finger_info for the ring finger, 0 is off.
+    /// </summary>
+    /// <param name="condition">run or not</param>
+    public void ShouldRunFingerInfo(bool condition)
+    {
+        if (condition)
+        {
+            manomotion_session.enabled_features.finger_info = 4;
+        }
+        else
+        {
+            manomotion_session.enabled_features.finger_info = 0;
+        }
+    }
+
+    private int minIndex = 0;
+    private int maxIndex = 5;
+
+    /// <summary>
+    /// Toggle wich finger do use for the finger information.
+    /// 0 = off
+    /// 1 = Thumb
+    /// 2 = Index
+    /// 3 = Middle
+    /// 4 = Ring
+    /// 5 = Pinky
+    /// </summary>
+    /// <param name="index">int between 0 and 5, 0 is off and 1-5 is the different fingers</param>
+    public void ToggleFingerInfoFinger(int index)
+    {
+        if (index <= maxIndex && index >= minIndex)
+        {
+            manomotion_session.enabled_features.finger_info = index;
+        }
+        else
+        {
+            Debug.Log("index needs to between 0 and 5, current index = " + index);
+        }
+    }
+
+    /// <summary>
+    /// Lets the SDK know if it should calculate hand contour.
+    /// </summary>
+    /// <param name="condition">run or not</param>
+    public void ShouldRunContour(bool condition)
+    {
+        if (condition)
+        {
+            manomotion_session.enabled_features.contour = 2;
+        }
+        else
+        {
+            manomotion_session.enabled_features.contour = 0;
         }
     }
 
@@ -582,9 +710,10 @@ public class ManomotionManager : ManomotionBase
     /// </summary>
     protected void ProcessFrame()
     {
+#if !UNITY_EDITOR
+		processFrame(ref hand_infos[0].hand_info, ref manomotion_session);
+#else
 
-#if !UNITY_EDITOR || UNITY_STANDALONE
- processFrame(ref hand_infos[0].hand_info, ref manomotion_session);
 #endif
 
     }
@@ -593,14 +722,21 @@ public class ManomotionManager : ManomotionBase
 
     protected override void Init(string serial_key)
     {
-#if !UNITY_EDITOR || UNITY_STANDALONE
+#if !UNITY_EDITOR
+		//_manoLicense = 
+        //ManoLicense test_license= new ManoLicense();
+        init(_manoSettings,ref _manoLicense);
+        //_manoLicense.days_left = test_license.days_left;
+		// init(_manoSettings);
+		_initialized = true;
+#else
+        Debug.LogError("Dont run in editor, SDK needs to be deployed to phone");
+        Debug.LogWarning("Dont run in editor, SDK needs to be deployed to phone");
 #endif
-        _manoLicense = init(_manoSettings);
-        initialized = true;
-
         if (OnManoMotionLicenseInitialized != null)
         {
             OnManoMotionLicenseInitialized();
         }
     }
+
 }

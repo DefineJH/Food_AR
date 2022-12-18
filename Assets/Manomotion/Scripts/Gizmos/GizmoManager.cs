@@ -2,11 +2,14 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
+using System;
 
+/// <summary>
+/// Handles wich features / gizmos that will be calculated and visualized.
+/// </summary>
 public class GizmoManager : MonoBehaviour
 {
     #region Singleton
-
     private static GizmoManager _instance;
     public static GizmoManager Instance
     {
@@ -20,60 +23,142 @@ public class GizmoManager : MonoBehaviour
             _instance = value;
         }
     }
-
     #endregion
 
+    /// The color of the hand state UI.
     public Color disabledStateColor;
 
     [SerializeField]
     private Image[] stateImages;
 
     [SerializeField]
+    private GameObject leftRightGizmo;
+    [SerializeField]
     private GameObject handStatesGizmo;
-
     [SerializeField]
     private GameObject manoClassGizmo;
-
     [SerializeField]
     private GameObject handSideGizmo;
-
     [SerializeField]
     private GameObject continuousGestureGizmo;
-
     [SerializeField]
     private GameObject triggerTextPrefab;
-
-    [SerializeField]
-    private GameObject palmCenterGizmo, POIGizmo;
-
     [SerializeField]
     private GameObject flagHolderGizmo;
-
     [SerializeField]
     private GameObject smoothingSliderControler;
+    [SerializeField]
+    private GameObject depthEstimationGizmo;
+    private GameObject wristInformationGizmo;
+    private GameObject fingerInformationGizmo;
+    [SerializeField]
+    private GameObject contourInformationGizmo;
+    private WristInfoGizmo wristInfoGizmo;
+    private FingerInfoGizmo fingerInfoGizmo;
+    [SerializeField]
+    private ContourGizmo contourGizmo;
 
     [SerializeField]
     private Text currentSmoothingValue;
 
     [SerializeField]
-    private GameObject gestureSmoothingSliderControler;
+    private bool _showGestureAnalysis;
 
     [SerializeField]
-    private Text currentGestureSmoothingValue;
+    private bool _showPickDrop;
+    [SerializeField]
+    private bool _showGrabRelease;
+    [SerializeField]
+    private bool _showSwipes;
+
+    private bool _showLeftRight;
+    private bool _showHandStates;
+    private bool _showManoClass;
+    private bool _showHandSide;
+    private bool _showContinuousGestures;
 
     [SerializeField]
-    private GameObject depthEstimationGizmo;
+    private bool _showWarnings;
+    private bool _showPickTriggerGesture;
+    private bool _showDropTriggerGesture;
+    private bool _showSwipeHorizontalTriggerGesture;
+    private bool _showSwipeVerticalTriggerGesture;
+    [SerializeField]
+    private bool _showClickTriggerGesture;
+    private bool _showGrabTriggerGesture;
+    private bool _showReleaseTriggerGesture;
+    [SerializeField]
+    private bool _showSmoothingSlider;
+    [SerializeField]
+    private bool _showDepthEstimation;
 
     [SerializeField]
-    private bool _showHandStates, _showManoClass, _showPalmCenter, _showPOI, _showHandSide, _showContinuousGestures, _showWarnings, _showPickTriggerGesture, _showDropTriggerGesture, _showClickTriggerGesture, _showGrabTriggerGesture, _showReleaseTriggerGesture, _showSmoothingSlider, _showDepthEstimation;
+    private bool _showWristInfo;
+    [SerializeField]
+    private bool _showFingerInfo;
+    [SerializeField]
+    private bool _showContour;
+    [SerializeField]
+    private bool skeleton3d;
+    [SerializeField]
+    private bool gestures;
+    [SerializeField]
+    private bool fastMode;
 
-    private GameObject topFlag, leftFlag, rightFlag;
-    private RectTransform palmCenterRectTransform, palmCenterFillAmmount, poiRectTransform, poiFillAmmount;
-    private Text manoClassText, handSideText, continuousGestureText;
+    private GameObject topFlag;
+    private GameObject leftFlag;
+    private GameObject rightFlag;
+
+    private Text leftRightText;
+    private Text manoClassText;
+    private Text handSideText;
+    private Text continuousGestureText;
+
+    private TMP_Text fingerFlag;
+    private TMP_Text wristFlag;
+
     private TextMeshProUGUI depthEstimationValue;
     private Image depthFillAmmount;
 
+
     #region Properties
+
+    public bool ShowLeftRight
+    {
+        get { return _showLeftRight; }
+        set { _showLeftRight = value; }
+    }
+
+    public bool ShowGrabRelease
+    {
+        get { return _showGrabRelease; }
+        set { _showGrabRelease = value; }
+    }
+
+    public bool ShowPickDrop
+    {
+        get { return _showPickDrop; }
+        set { _showPickDrop = value; }
+    }
+
+    public bool ShowSwipes
+    {
+        get { return _showSwipes; }
+        set { _showSwipes = value; }
+    }
+
+    public bool ShowGestureAnalysis
+    {
+        get
+        {
+            return _showGestureAnalysis;
+        }
+
+        set
+        {
+            _showGestureAnalysis = value;
+        }
+    }
 
     public bool ShowContinuousGestures
     {
@@ -98,32 +183,6 @@ public class GizmoManager : MonoBehaviour
         set
         {
             _showManoClass = value;
-        }
-    }
-
-    public bool ShowPalmCenter
-    {
-        get
-        {
-            return _showPalmCenter;
-        }
-
-        set
-        {
-            _showPalmCenter = value;
-        }
-    }
-
-    public bool ShowPOI
-    {
-        get
-        {
-            return _showPOI;
-        }
-
-        set
-        {
-            _showPOI = value;
         }
     }
 
@@ -192,6 +251,32 @@ public class GizmoManager : MonoBehaviour
         }
     }
 
+    public bool ShowSwipeHorizontalTriggerGesture
+    {
+        get
+        {
+            return _showSwipeHorizontalTriggerGesture;
+        }
+
+        set
+        {
+            _showSwipeHorizontalTriggerGesture = value;
+        }
+    }
+
+    public bool ShowSwipeVerticalTriggerGesture
+    {
+        get
+        {
+            return _showSwipeVerticalTriggerGesture;
+        }
+
+        set
+        {
+            _showSwipeVerticalTriggerGesture = value;
+        }
+    }
+
     public bool ShowClickTriggerGesture
     {
         get
@@ -256,6 +341,78 @@ public class GizmoManager : MonoBehaviour
         }
     }
 
+    public bool ShowSkeleton3d
+    {
+        get
+        {
+            return skeleton3d;
+        }
+        set
+        {
+            skeleton3d = value;
+        }
+    }
+
+    public bool ShowGestures
+    {
+        get
+        {
+            return gestures;
+        }
+        set
+        {
+            gestures = value;
+        }
+    }
+
+    public bool Fastmode
+    {
+        get
+        {
+            return fastMode;
+        }
+        set
+        {
+            fastMode = value;
+        }
+    }
+
+    public bool ShowWristInfo
+    {
+        get
+        {
+            return _showWristInfo;
+        }
+        set
+        {
+            _showWristInfo = value;
+        }
+    }
+
+    public bool ShowFingerInfo
+    {
+        get
+        {
+            return _showFingerInfo;
+        }
+        set
+        {
+            _showFingerInfo = value;
+        }
+    }
+
+    public bool ShowContour
+    {
+        get
+        {
+            return _showContour;
+        }
+        set
+        {
+            _showContour = value;
+        }
+    }
+
     #endregion
 
     void Start()
@@ -269,22 +426,32 @@ public class GizmoManager : MonoBehaviour
             Destroy(this.gameObject);
         }
 
-        Initialize();
-    }
-
-    private void Initialize()
-    {
         SetGestureDescriptionParts();
+        SetFlagDescriptionParts();
         HighlightStatesToStateDetection(0);
         InitializeFlagParts();
         InitializeTriggerPool();
-        ManomotionManager.OnManoMotionFrameProcessed += DisplayInformationAfterManoMotionProcessFrame;
+        SetFeaturesToCalculate();
     }
 
     /// <summary>
-    /// Visualizes information from the ManoMotion Manager after the frame has been processed.
+    /// Sets which features that should be calculated
     /// </summary>
-    void DisplayInformationAfterManoMotionProcessFrame()
+    private void SetFeaturesToCalculate()
+    {
+        ManomotionManager.Instance.ShouldCalculateGestures(ShowGestures);
+        ManomotionManager.Instance.ShouldCalculateSkeleton3D(ShowSkeleton3d);
+        ManomotionManager.Instance.ShouldRunFastMode(Fastmode);
+        ManomotionManager.Instance.ShouldRunWristInfo(ShowWristInfo);
+        ManomotionManager.Instance.ShouldRunFingerInfo(ShowFingerInfo);
+        ManomotionManager.Instance.ShouldRunContour(ShowContour);
+    }
+
+    /// <summary>
+    /// Updates the GestureInfo, TrackingInfo, Warning and Session every frame.
+    /// Also updates all the display methods
+    /// </summary>
+    void Update()
     {
         GestureInfo gestureInfo = ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info;
         TrackingInfo trackingInfo = ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info;
@@ -295,17 +462,71 @@ public class GizmoManager : MonoBehaviour
         DisplayManoclass(gestureInfo.mano_class);
         DisplayTriggerGesture(gestureInfo.mano_gesture_trigger, trackingInfo);
         DisplayHandState(gestureInfo.state);
-        DisplayPalmCenter(trackingInfo.palm_center, gestureInfo, warning);
-        DisplayPOI(gestureInfo, warning, trackingInfo);
         DisplayHandSide(gestureInfo.hand_side);
         DisplayApproachingToEdgeFlags(warning);
+        DisplayFingerFlags(trackingInfo, gestureInfo);
+        DisplayWristFlags(trackingInfo, gestureInfo);
         DisplayCurrentsmoothingValue(session);
-        DisplayCurrentGestureSmoothingValue(session);
         DisplaySmoothingSlider();
         DisplayDepthEstimation(trackingInfo.depth_estimation);
+        DisplayWristInformation();
+        DisplayFingerInformation();
+        DisplayContour();
+        DisplayLeftRight(gestureInfo.is_right);
     }
 
     #region Display Methods
+
+    /// <summary>
+    /// Displays the Wrist Information from WristInfoGizmo for the detected hand if feature is on.
+    /// </summary>
+    private void DisplayWristInformation()
+    {
+        if (wristInfoGizmo == null)
+        {
+            wristInfoGizmo = GameObject.Find("TryOnManager").GetComponent<WristInfoGizmo>();
+            wristInformationGizmo = GameObject.Find("Wrist");
+        }
+
+        wristInformationGizmo.SetActive(ShowWristInfo);
+
+        if (ShowWristInfo)
+        {
+            wristInfoGizmo.ShowWristInformation();
+        }
+    }
+
+    /// <summary>
+    /// Dispalys the Finger information from FingerInfoGizmo for the detected hand if feature is on.
+    /// </summary>
+    private void DisplayFingerInformation()
+    {
+        if (fingerInfoGizmo == null)
+        {
+            fingerInfoGizmo = GameObject.Find("TryOnManager").GetComponent<FingerInfoGizmo>();
+            fingerInformationGizmo = GameObject.Find("Finger");
+        }
+
+        fingerInformationGizmo.SetActive(ShowFingerInfo);
+
+        if (ShowFingerInfo)
+        {
+            fingerInfoGizmo.ShowFingerInformation();
+        }
+    }
+
+    /// <summary>
+    /// Displays the hand contour from ContourGizmo if feature is on.
+    /// </summary>
+    private void DisplayContour()
+    {
+        contourInformationGizmo.SetActive(ShowContour);
+
+        if (ShowContour)
+        {
+            contourGizmo.ShowContour();
+        }
+    }
 
     /// <summary>
     /// Displays the depth estimation of the detected hand.
@@ -333,132 +554,23 @@ public class GizmoManager : MonoBehaviour
     /// <summary>
     /// Displays in text value the current smoothing value of the session
     /// </summary>
-    /// <param name="session">Session.</param>
+    /// <param name="session">Requires a Session.</param>
     void DisplayCurrentsmoothingValue(Session session)
     {
         if (smoothingSliderControler.activeInHierarchy)
         {
-            currentSmoothingValue.text = "Tracking Smoothing: " + session.smoothing_controller.ToString("F2");
-        }
-    }
-
-    /// <summary>
-    /// Displays in text value the current smoothing value of the session
-    /// </summary>
-    /// <param name="session">Session.</param>
-    void DisplayCurrentGestureSmoothingValue(Session session)
-    {
-        if (smoothingSliderControler.activeInHierarchy)
-        {
-            currentGestureSmoothingValue.text = "Gesture Smoothing: " + session.gesture_smoothing_controller.ToString("F2");
-        }
-    }
-
-    /// <summary>
-    /// Displayes palm center cursor
-    /// </summary>
-    /// <param name="palmCenter">Requires the estimated position of the bounding box center.</param>
-    void DisplayPalmCenter(Vector3 palmCenter, GestureInfo gesture, Warning warning)
-    {
-        if (ShowPalmCenter)
-        {
-            if (warning != Warning.WARNING_HAND_NOT_FOUND)
-            {
-                if (!palmCenterGizmo.activeInHierarchy)
-                {
-                    palmCenterGizmo.SetActive(true);
-                }
-                float smoothing = 1 - ManomotionManager.Instance.Manomotion_Session.smoothing_controller;
-
-                palmCenterRectTransform.position = Camera.main.ViewportToScreenPoint(palmCenter);
-                float newFillAmmount = 1 - ((int)(gesture.state / 6) * 0.25f);
-                palmCenterFillAmmount.localScale = Vector3.Lerp(palmCenterFillAmmount.localScale, Vector3.one * newFillAmmount, 0.9f);
-            }
-            else
-            {
-                if (palmCenterGizmo.activeInHierarchy)
-                {
-                    palmCenterGizmo.SetActive(false);
-                }
-            }
-        }
-        else
-        {
-            if (palmCenterGizmo.activeInHierarchy)
-            {
-                palmCenterGizmo.SetActive(false);
-            }
-        }
-    }
-
-    int maxThumbCounter = 10;
-    int minThumbCounter = 0;
-    int currentThumbCounter = 0;
-
-    /// <summary>
-    /// Display the POI cursor
-    /// </summary>
-    /// <param name="gesture">Gesture.</param>
-    /// <param name="warning">Warning.</param>
-    /// <param name="trackingInfo">Tracking info.</param>
-    void DisplayPOI(GestureInfo gesture, Warning warning, TrackingInfo trackingInfo)
-    {
-        bool isPinchWellDetected = currentThumbCounter > maxThumbCounter / 2;
-        if (ShowPOI)
-        {
-            if (gesture.mano_class == ManoClass.PINCH_GESTURE)
-            {
-                if (currentThumbCounter < maxThumbCounter)
-                {
-                    currentThumbCounter++;
-                }
-            }
-            else
-            {
-                if (currentThumbCounter > minThumbCounter)
-                {
-                    currentThumbCounter--;
-                }
-            }
-
-            if (warning != Warning.WARNING_HAND_NOT_FOUND && isPinchWellDetected)
-            {
-                if (!POIGizmo.activeInHierarchy)
-                {
-                    POIGizmo.SetActive(true);
-                }
-                float smoothing = 1 - ManomotionManager.Instance.Manomotion_Session.smoothing_controller;
-
-                poiRectTransform.position = Camera.main.ViewportToScreenPoint(trackingInfo.poi);
-
-                float newFillAmmount = 1 - ((int)(gesture.state / 6) * 0.25f);
-                poiFillAmmount.localScale = Vector3.Lerp(palmCenterFillAmmount.localScale, Vector3.one * newFillAmmount, 0.9f);
-            }
-            else
-            {
-                if (POIGizmo.activeInHierarchy)
-                {
-                    POIGizmo.SetActive(false);
-                }
-            }
-        }
-        else
-        {
-            if (POIGizmo.activeInHierarchy)
-            {
-                POIGizmo.SetActive(false);
-            }
+            currentSmoothingValue.text = "Tracking smoothing: " + session.smoothing_controller.ToString("F2");
         }
     }
 
     /// <summary>
     /// Displays information regarding the detected manoclass
     /// </summary>
-    /// <param name="manoclass">Manoclass.</param>
+    /// <param name="manoclass">Requires a Manoclass.</param>
     void DisplayManoclass(ManoClass manoclass)
     {
-        manoClassGizmo.SetActive(ShowManoClass);
-        if (ShowManoClass)
+        manoClassGizmo.SetActive(ShowGestureAnalysis);
+        if (ShowGestureAnalysis)
         {
             switch (manoclass)
             {
@@ -487,8 +599,8 @@ public class GizmoManager : MonoBehaviour
     /// <param name="manoGestureContinuous">Requires a continuous Gesture.</param>
     void DisplayContinuousGestures(ManoGestureContinuous manoGestureContinuous)
     {
-        continuousGestureGizmo.SetActive(ShowContinuousGestures);
-        if (ShowContinuousGestures)
+        continuousGestureGizmo.SetActive(ShowGestureAnalysis);
+        if (ShowGestureAnalysis)
         {
             switch (manoGestureContinuous)
             {
@@ -518,13 +630,19 @@ public class GizmoManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Displays the hand side.
+    /// Displays wich hand side currently facing the camera.
     /// </summary>
     /// <param name="handside">Requires a ManoMotion Handside.</param>
     void DisplayHandSide(HandSide handside)
     {
-        handSideGizmo.SetActive(ShowHandSide);
-        if (ShowHandSide)
+        handSideGizmo.SetActive(ShowGestureAnalysis);
+
+        if (!handSideGizmo.activeInHierarchy && ShowHandSide)
+        {
+            handSideGizmo.SetActive(ShowHandSide);
+        }
+
+        if (ShowGestureAnalysis || ShowHandSide)
         {
             switch (handside)
             {
@@ -544,37 +662,67 @@ public class GizmoManager : MonoBehaviour
         }
     }
 
-    ///// <summary>
-    ///// Updates the visual information that showcases the hand state (how open/closed) it is
-    ///// </summary>
-    ///// <param name="gesture_info"></param>
+    /// <summary>
+    /// Displays wich hand currently facing the camera.
+    /// </summary>
+    /// <param name="isRight">Requiers the isRight from Gesture Inforamtion</param>
+    void DisplayLeftRight(int isRight)
+    {
+        leftRightGizmo.SetActive(ShowGestureAnalysis);
+
+        if (ShowGestureAnalysis)
+        {
+            switch (isRight)
+            {
+                case 0:
+                    leftRightText.text = "Hand: Left";
+                    break;
+                case 1:
+                    leftRightText.text = "Hand: Right";
+                    break;
+                default:
+                    leftRightText.text = "Hand: None";
+                    break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Updates the visual information that showcases the hand state (how open/closed) it is
+    /// </summary>
+    /// <param name="handstate">Requires a handsate int</param>
     void DisplayHandState(int handstate)
     {
-        handStatesGizmo.SetActive(ShowHandStates);
-        if (ShowHandStates)
+        handStatesGizmo.SetActive(ShowGestureAnalysis);
+        if (ShowGestureAnalysis)
         {
             HighlightStatesToStateDetection(handstate);
         }
     }
 
-    ManoGestureTrigger previousTrigger;
+    private ManoGestureTrigger previousTrigger;
+
     /// <summary>
-    /// Display Visual information of the detected trigger gesture.
+    /// Display Visual information of the detected trigger gesture and trigger swipes.
     /// In the case where a click is intended (Open pinch, Closed Pinch, Open Pinch) we are clearing out the visual information that are generated from the pick/drop
     /// </summary>
-    /// <param name="triggerGesture">Requires an input of trigger gesture.</param>
+    /// <param name="triggerGesture">Requires an input from ManoGestureTrigger.</param>
+    /// <param name="trackingInfo">Requires an input of tracking info.</param>
     void DisplayTriggerGesture(ManoGestureTrigger triggerGesture, TrackingInfo trackingInfo)
     {
+
         if (triggerGesture != ManoGestureTrigger.NO_GESTURE)
         {
-            if (_showPickTriggerGesture)
+
+            if (_showPickDrop)
             {
                 if (triggerGesture == ManoGestureTrigger.PICK)
                 {
                     TriggerDisplay(trackingInfo, ManoGestureTrigger.PICK);
                 }
             }
-            if (_showDropTriggerGesture)
+
+            if (_showPickDrop)
             {
                 if (triggerGesture == ManoGestureTrigger.DROP)
                 {
@@ -584,6 +732,7 @@ public class GizmoManager : MonoBehaviour
                     }
                 }
             }
+
             if (_showClickTriggerGesture)
             {
                 if (triggerGesture == ManoGestureTrigger.CLICK)
@@ -595,17 +744,52 @@ public class GizmoManager : MonoBehaviour
                     }
                 }
             }
-            if (_showGrabTriggerGesture)
+
+            if (_showSwipes)
+            {
+                if (triggerGesture == ManoGestureTrigger.SWIPE_LEFT)
+                {
+                    TriggerDisplay(trackingInfo, ManoGestureTrigger.SWIPE_LEFT);
+                }
+            }
+
+            if (_showSwipes)
+            {
+                if (triggerGesture == ManoGestureTrigger.SWIPE_RIGHT)
+                {
+                    TriggerDisplay(trackingInfo, ManoGestureTrigger.SWIPE_RIGHT);
+                }
+            }
+
+            if (_showSwipes)
+            {
+                if (triggerGesture == ManoGestureTrigger.SWIPE_UP)
+                {
+                    TriggerDisplay(trackingInfo, ManoGestureTrigger.SWIPE_UP);
+                }
+            }
+
+            if (_showSwipes)
+            {
+                if (triggerGesture == ManoGestureTrigger.SWIPE_DOWN)
+                {
+                    TriggerDisplay(trackingInfo, ManoGestureTrigger.SWIPE_DOWN);
+                }
+            }
+
+            if (_showGrabRelease)
             {
                 if (triggerGesture == ManoGestureTrigger.GRAB_GESTURE)
                     TriggerDisplay(trackingInfo, ManoGestureTrigger.GRAB_GESTURE);
             }
-            if (_showReleaseTriggerGesture)
+
+            if (_showGrabRelease)
             {
                 if (triggerGesture == ManoGestureTrigger.RELEASE_GESTURE)
                     TriggerDisplay(trackingInfo, ManoGestureTrigger.RELEASE_GESTURE);
             }
         }
+
         previousTrigger = triggerGesture;
     }
 
@@ -645,9 +829,11 @@ public class GizmoManager : MonoBehaviour
     /// <summary>
     /// Displays the visual information of the performed trigger gesture.
     /// </summary>
+    /// <param name="bounding_box">Bounding box.</param>
     /// <param name="triggerGesture">Trigger gesture.</param>
     void TriggerDisplay(TrackingInfo trackingInfo, ManoGestureTrigger triggerGesture)
     {
+
         if (GetCurrentPooledTrigger())
         {
             GameObject triggerVisualInformation = GetCurrentPooledTrigger();
@@ -656,6 +842,7 @@ public class GizmoManager : MonoBehaviour
             triggerVisualInformation.name = triggerGesture.ToString();
             triggerVisualInformation.GetComponent<TriggerGizmo>().InitializeTriggerGizmo(triggerGesture);
             triggerVisualInformation.GetComponent<RectTransform>().position = Camera.main.ViewportToScreenPoint(trackingInfo.palm_center);
+
         }
     }
 
@@ -681,7 +868,7 @@ public class GizmoManager : MonoBehaviour
     /// <summary>
     /// Highlights the edges of the screen according to the warning given by the ManoMotion Manager
     /// </summary>
-    /// <param name="warning">Requires a warning.</param>
+    /// <param name="warning">Requires a Warning.</param>
     void DisplayApproachingToEdgeFlags(Warning warning)
     {
         if (_showWarnings)
@@ -705,6 +892,104 @@ public class GizmoManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Prints out the wrist information error codeif wrist information can´t be calculated correctly.
+    /// </summary>
+    /// <param name="trackingInfo"></param>
+    private void DisplayWristFlags(TrackingInfo trackingInfo, GestureInfo gestureInfo)
+    {
+        if (wristFlag != null)
+        {
+            if (ShowWristInfo && gestureInfo.mano_class != ManoClass.NO_HAND)
+            {
+                switch (trackingInfo.wristInfo.wristWarning)
+                {
+                    case 0:
+                        wristFlag.text = "";
+                        break;
+                    case 2000:
+                        wristFlag.text = "WRIST ERROR[2000]";
+                        break;
+                    default:
+                        wristFlag.text = "";
+                        break;
+                }
+            }
+
+            else
+            {
+                wristFlag.text = "";
+            }
+        }
+    }
+
+    /// <summary>
+    /// Prints out the finger infor´mation error code if finger information can´t be calculated correctly.
+    /// </summary>
+    /// <param name="trackingInfo">tracking information</param>
+    private void DisplayFingerFlags(TrackingInfo trackingInfo, GestureInfo gestureInfo)
+    {
+        if (fingerFlag != null)
+        {
+            if (ShowFingerInfo && gestureInfo.mano_class != ManoClass.NO_HAND)
+            {
+                switch (trackingInfo.fingerInfo.fingerWarning)
+                {
+                    case 0:
+                        fingerFlag.text = "";
+                        break;
+                    case 1001:
+                        fingerFlag.text = "FINGER ERROR[1001]";
+                        break;
+                    case 1002:
+                        fingerFlag.text = "FINGER POINTS CLOSE TO EDGE[1002]";
+                        break;
+                    case 1003:
+                        fingerFlag.text = "FINGER POINTS OUTSIDE FRAME[1003]";
+                        break;
+                    case 1004:
+                        fingerFlag.text = "FINGER POINTS TO CLOSE TO PALM[1004]";
+                        break;
+                    case 1005:
+                        fingerFlag.text = "FINGER ERROR[1005]";
+                        break;
+                    case 1006:
+                        fingerFlag.text = "FINGER ERROR[1006]";
+                        break;
+                    case 1007:
+                        fingerFlag.text = "FINGER ERROR[1007]";
+                        break;
+                    case 1008:
+                        fingerFlag.text = "FINGER ERROR[1008]";
+                        break;
+                    case 1009:
+                        fingerFlag.text = "FINGER ERROR[1009]";
+                        break;
+                    case 1010:
+                        fingerFlag.text = "FINGER ERROR[1010]";
+                        break;
+                    case 1011:
+                        fingerFlag.text = "FINGER ERROR[1011]";
+                        break;
+                    case 1012:
+                        fingerFlag.text = "FINGER ERROR[1012]";
+                        break;
+                    case 1013:
+                        fingerFlag.text = "FINGER ERROR[1013]";
+                        break;
+                    default:
+                        fingerFlag.text = "";
+                        break;
+                }
+            }
+
+            else
+            {
+                fingerFlag.text = "";
+            }
+        }
+    }
+
+    /// <summary>
     /// Displayes the smoothing slider.
     /// </summary>
     /// <param name="display">If set to <c>true</c> display.</param>
@@ -719,7 +1004,6 @@ public class GizmoManager : MonoBehaviour
     public void DisplaySmoothingSlider()
     {
         smoothingSliderControler.SetActive(_showSmoothingSlider);
-        gestureSmoothingSliderControler.SetActive(_showSmoothingSlider);
     }
 
     /// <summary>
@@ -730,11 +1014,33 @@ public class GizmoManager : MonoBehaviour
         manoClassText = manoClassGizmo.transform.Find("Description").GetComponent<Text>();
         handSideText = handSideGizmo.transform.Find("Description").GetComponent<Text>();
         continuousGestureText = continuousGestureGizmo.transform.Find("Description").GetComponent<Text>();
-        palmCenterRectTransform = palmCenterGizmo.GetComponent<RectTransform>();
-        palmCenterFillAmmount = palmCenterGizmo.transform.GetChild(0).GetComponent<RectTransform>();
+        leftRightText = leftRightGizmo.transform.Find("Description").GetComponent<Text>();
+    }
 
-        poiRectTransform = POIGizmo.GetComponent<RectTransform>();
-        poiFillAmmount = POIGizmo.transform.GetChild(0).GetComponent<RectTransform>();
+    /// <summary>
+    /// Initialized the text componets for displaying the finger and wrist flags.
+    /// </summary>
+    void SetFlagDescriptionParts()
+    {
+        try
+        {
+            fingerFlag = GameObject.Find("FingerFlag").GetComponent<TMP_Text>();
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Cant find finger flag TMP_Text.");
+            Debug.Log(ex);
+        }
+
+        try
+        {
+            wristFlag = GameObject.Find("WristFlag").GetComponent<TMP_Text>();
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Cant find wrist flag TMP_Text.");
+            Debug.Log(ex);
+        }
     }
 
     /// <summary>

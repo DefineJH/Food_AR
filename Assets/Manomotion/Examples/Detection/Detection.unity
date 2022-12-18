@@ -857,6 +857,8 @@ MonoBehaviour:
   leftEdge: {fileID: 349873895}
   topEdge: {fileID: 458362385}
   fadeSpeed: 5
+  maxOpacity: 1
+  minOpacity: 0
 --- !u!1001 &1217157159
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -19,14 +19,11 @@ public class StartApplicationInstruction : Instruction
         this._instructionSteps = 1;
         this._instructionName = "Ready to go!";
         this._instructionSeen = false;
-        this._cardText = "You have now seen some of the core features of the SDK CE. But there are definately more. Feel free to further explore them";
-
-
+        this._cardText = "You have now seen some of the core features of the SDK PRO. But there are definately more. Feel free to further explore them";
     }
 
     override public void GuideHowTo()
     {
         ApplicationManager.Instance.howToInstructor.ConfirmInstructionSeen();
-
     }
 }

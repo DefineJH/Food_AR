@@ -16,6 +16,8 @@ public class ARCubeInteraction : MonoBehaviour
     private string handTag = "Player";
     private Renderer cubeRenderer;
 
+    private float skeletonConfidenceThreshold = 0.0001f;
+
     void Start()
     {
         Initialize();
@@ -31,13 +33,26 @@ public class ARCubeInteraction : MonoBehaviour
         cubeRenderer.material = arCubeMaterial[0];
     }
 
+    private void Update()
+    {
+        if (ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.skeleton.confidence < skeletonConfidenceThreshold)
+        {
+            cubeRenderer.sharedMaterial = arCubeMaterial[0];
+        }
+    }
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="other">The collider that stays</param>
     private void OnTriggerStay(Collider other)
     {
-        MoveWhenGrab(other);
+        if (other.gameObject.tag == handTag)
+        {
+            cubeRenderer.sharedMaterial = arCubeMaterial[1];
+        }
+
+        //MoveWhenGrab(other);
         RotateWhenHolding(other);
         SpawnWhenClicking(other);
     }

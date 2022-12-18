@@ -10,6 +10,7 @@ using System.IO;
 
 public class EditorScripts : MonoBehaviour
 {
+
 	[PostProcessBuild (999)]
 	public static void OnPostProcessBuild (BuildTarget buildTarget, string path)
 	{
@@ -45,8 +46,10 @@ public class EditorScripts : MonoBehaviour
                 pbxProject.SetBuildProperty(unityFrameworkTargetGuid, "ENABLE_BITCODE", "NO");
             }
 
+            
             pbxProject.WriteToFile(projectPath);
         }
 #endif
     }
 }
+ 
