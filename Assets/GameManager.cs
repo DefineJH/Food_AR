@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
     private static GameManager instance = null;
 
     public Canvas m_Canvas;
+    public GameObject m_PopUpPrefab;
+    public GameObject m_PopUpInst;
     public GameObject m_RecipeChoosePanel;
     public GameObject m_RecipeChoosePanel_Inst;
     public GameObject m_PastaCanvas;
@@ -106,8 +108,52 @@ public class GameManager : MonoBehaviour
 
             }
         }
-    }
+        if (obj.name == "MoveUp")
+        {
+            if (m_SelectedRecipe == Recipe.Pasta)
+            {
+                m_PastaCanvas_Inst.GetComponent<PastaInstruction>().MoveUp();
+            }
+            else
+            {
 
+            }
+        }
+        if (obj.name == "MoveDown")
+        {
+            if (m_SelectedRecipe == Recipe.Pasta)
+            {
+                m_PastaCanvas_Inst.GetComponent<PastaInstruction>().MoveDown();
+            }
+            else
+            {
+
+            }
+        }
+        if(obj.name == "DebugProgress")
+        {
+            if (m_SelectedRecipe == Recipe.Pasta)
+            {
+                m_PastaCanvas_Inst.GetComponent<PastaInstruction>().Progress();
+            }
+            else
+            {
+
+            }
+        }
+        if(obj.name.Contains("Timer"))
+        {
+            m_PastaCanvas_Inst.GetComponent<PastaInstruction>().ApplyTimer();
+        }
+        if(obj.name == "PopUp")
+        {
+            Destroy(m_PopUpInst);
+        }
+    }
+    public void CreateUIPopUp(string title, string desc)
+    {
+        m_PopUpInst = GameObject.Instantiate(m_PopUpPrefab, m_Canvas.transform);
+    }
     void StartCooking(string recipe)
     {
         Debug.Log(recipe);
