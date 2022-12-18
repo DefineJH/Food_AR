@@ -194,6 +194,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 166568181}
   m_CullTransparentMesh: 0
+--- !u!95 &205295211 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 95380660509660732, guid: 0f8504ddba966c5459c5954aff90da2d,
+    type: 3}
+  m_PrefabInstance: {fileID: 485093476}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &266248625
 GameObject:
   m_ObjectHideFlags: 0
@@ -232,7 +238,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 54.8, y: 83.1}
+  m_AnchoredPosition: {x: 73, y: 138}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &266248627
@@ -815,6 +821,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Canvas: {fileID: 1391763295}
+  m_PopUpPrefab: {fileID: 5553215380965756558, guid: 80247d90e2ec7eb478b683389ee3a704,
+    type: 3}
+  m_PopUpInst: {fileID: 0}
   m_RecipeChoosePanel: {fileID: 4091445579402721412, guid: c24a32ad517a63e49b2de178d6366175,
     type: 3}
   m_RecipeChoosePanel_Inst: {fileID: 0}
@@ -1073,12 +1082,12 @@ PrefabInstance:
         type: 3}
       propertyPath: statusAnimator
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 205295211}
     - target: {fileID: 114656061702543436, guid: 3b19460acec7fad4baeab3db2a8268e1,
         type: 3}
       propertyPath: lowPowerAnimator
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1941278239}
     - target: {fileID: 224177848247263556, guid: 3b19460acec7fad4baeab3db2a8268e1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1332,6 +1341,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_FocusMode: 1
   m_LightEstimationMode: 0
+--- !u!95 &1941278239 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 1849737039, guid: 0f8504ddba966c5459c5954aff90da2d,
+    type: 3}
+  m_PrefabInstance: {fileID: 485093476}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2069872579
 GameObject:
   m_ObjectHideFlags: 0
