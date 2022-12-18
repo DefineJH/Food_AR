@@ -34,6 +34,7 @@ public class InteractionPoint : MonoBehaviour
         if(ARSession.state == ARSessionState.SessionTracking)
         {
             FollowIndexFingertip();
+        }
             if(m_IsSelecting)
             {
                 m_SelectImage.fillAmount += Time.deltaTime;
@@ -47,7 +48,6 @@ public class InteractionPoint : MonoBehaviour
             {
                 m_SelectImage.fillAmount = 0;
             }
-        }
     }
 
     void RefreshPointer()
