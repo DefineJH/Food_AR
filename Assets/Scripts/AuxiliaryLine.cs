@@ -17,10 +17,11 @@ public class AuxiliaryLine : MonoBehaviour
                 cubes.Add(tf);
         }
         
-        SetAuxLine(0.02f, 12f);
+        Hide()
+        // SetAuxLine(0.02f, 12f);
     }
 
-    public void SetAuxLine(float gap, float angleY=0f, float angleZ=0f)
+    public void SetAuxLine(float gap=0.02f, float angleY=0f, float angleZ=0f)
     {
         for (var i = 0; i < cubes.Count; i += 1)
         {
@@ -29,6 +30,13 @@ public class AuxiliaryLine : MonoBehaviour
             
             cubes[i].position = current;
             cubes[i].eulerAngles = new Vector3(0, angleY, angleZ);
+            cubes[i].scale = new Vector3(0.00025, 0.008, 0.1);
         }
+    }
+
+    public void Hide()
+    {
+        foreach (var cube in cubes)
+            cube.transform.scale = new Vector3();
     }
 }
