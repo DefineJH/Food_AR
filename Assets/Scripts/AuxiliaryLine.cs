@@ -21,12 +21,13 @@ public class AuxiliaryLine : MonoBehaviour
         // SetAuxLine(0.02f, 12f);
     }
 
-    public void SetAuxLine(float gap=0.02f, float angleY=0f, float angleZ=0f)
+    public void SetAuxLine(int count=4, float gap=0.02f, float angleY=0f, float angleZ=0f)
     {
-        for (var i = 0; i < cubes.Count; i += 1)
+        Hide();
+        for (var i = 0; i < count; i += 1)
         {
             var current = cubes[i].position;
-            current.x = (i - 1.5f) * gap;
+            current.x = (i - count * (count-1) / 2.0f) * gap;
             
             cubes[i].position = current;
             cubes[i].eulerAngles = new Vector3(0, angleY, angleZ);
